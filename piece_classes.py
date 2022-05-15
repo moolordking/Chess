@@ -78,6 +78,29 @@ class Knight(Piece):
         self.value = 3
         self.possible_valid_move_indices = []
 
+    def valid_moves(self,chess_board):
+        self.possible_valid_move_indices = []
+
+        if self.check_empty_space(self.position, -17, True, chess_board, 1, 2):
+            self.possible_valid_move_indices.append(self.position-17)
+        if self.check_empty_space(self.position, -15, True, chess_board, 1, 2):
+            self.possible_valid_move_indices.append(self.position-15)
+        if self.check_empty_space(self.position, -10, True, chess_board, 1, 1):
+            self.possible_valid_move_indices.append(self.position-10)
+        if self.check_empty_space(self.position, -6, True, chess_board, 1, 1):
+            self.possible_valid_move_indices.append(self.position-6)
+
+        if self.check_empty_space(self.position, 17, True, chess_board, 1, 2):
+            self.possible_valid_move_indices.append(self.position+17)
+        if self.check_empty_space(self.position, +15, True, chess_board, 1, 2):
+            self.possible_valid_move_indices.append(self.position+15)
+        if self.check_empty_space(self.position, 10, True, chess_board, 1, 1):
+            self.possible_valid_move_indices.append(self.position+10)
+        if self.check_empty_space(self.position, 6, True, chess_board, 1, 1):
+            self.possible_valid_move_indices.append(self.position+6)
+
+        return self.possible_valid_move_indices
+
 class Bishop(Piece):
     def __init__(self, col):
         super().__init__("bishop",col)
