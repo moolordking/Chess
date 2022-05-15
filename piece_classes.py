@@ -20,9 +20,9 @@ class Piece(object):
     def check_empty_space(self, position, num, leftordown, chess_board, expected=0, diagonal=False):
         if diagonal:
             if num<0:
-                return position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 != ((position//8)-(diagonal+1))
+                return position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 == ((position//8)-(diagonal))
             else:
-                return position+num<64 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 != ((position//8)+(diagonal+1))
+                return position+num<64 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 == ((position//8)+(diagonal))
         elif leftordown:
             if num<0:
                 return ((position+num)//8 == (position)//8)+expected and position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
@@ -87,6 +87,40 @@ class Bishop(Piece):
         self.value = 3
         self.possible_valid_move_indices = []
 
+    def valid_moves(self,chess_board):
+        self.possible_valid_move_indices = []
+
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (i*8)+i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(i*8)+i)
+            else:
+                break
+            if v_range(self.position+(i*8)+i,0,64) and chess_board.board[self.position+(i*8)+i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (i*8)-i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(i*8)-i)
+            else:
+                break
+            if v_range(self.position+(i*8)-i,0,64) and chess_board.board[self.position+(i*8)-i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (-i*8)+i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(-i*8)+i)
+            else:
+                break
+            if v_range(self.position+(-i*8)+i,0,64) and chess_board.board[self.position+(-i*8)+i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (-i*8)-i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(-i*8)-i)
+            else:
+                break
+            if v_range(self.position+(-i*8)-i,0,64) and chess_board.board[self.position+(-i*8)-i].piece_on_top:
+                break
+
+        return self.possible_valid_move_indices
+
 class Queen(Piece):
     def __init__(self, col):
         super().__init__("queen",col)
@@ -119,9 +153,35 @@ class Queen(Piece):
                 self.possible_valid_move_indices.append(self.position+x)
             if v_range(self.position+x,0,64) and chess_board.board[self.position+x].piece_on_top:
                 break
-
-        for topright in range (1,7):
-            pass
+        # diagonals
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (i*8)+i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(i*8)+i)
+            else:
+                break
+            if v_range(self.position+(i*8)+i,0,64) and chess_board.board[self.position+(i*8)+i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (i*8)-i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(i*8)-i)
+            else:
+                break
+            if v_range(self.position+(i*8)-i,0,64) and chess_board.board[self.position+(i*8)-i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (-i*8)+i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(-i*8)+i)
+            else:
+                break
+            if v_range(self.position+(-i*8)+i,0,64) and chess_board.board[self.position+(-i*8)+i].piece_on_top:
+                break
+        for i in range (1,8):
+            if self.check_empty_space(self.position, (-i*8)-i, False, chess_board, 1, i):
+                self.possible_valid_move_indices.append(self.position+(-i*8)-i)
+            else:
+                break
+            if v_range(self.position+(-i*8)-i,0,64) and chess_board.board[self.position+(-i*8)-i].piece_on_top:
+                break
 
         return self.possible_valid_move_indices
 
@@ -169,7 +229,11 @@ class Pawn(Piece):
     def valid_moves(self,chess_board):
         self.possible_valid_move_indices = []
         nop = 1
-        if self.col == 1:
+        if self.col == 1 and chess_board.player_side == 0:
+            nop = -1
+        if self.col == 1 and chess_board.player_side == 1:
+            nop = 1
+        if self.col == 0 and chess_board.player_side == 1:
             nop = -1
         if not(chess_board.board[self.position-(8*nop)].piece_on_top):
             self.possible_valid_move_indices.append(self.position-(8*nop))
