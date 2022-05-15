@@ -63,7 +63,7 @@ def create_game_gui(old_root=None):
 def create_board(canv,board_width,side=0):
     chess_board = Board(canv,board_width)
     chess_board.set_up(side)
-    chess_board.board[36].add_piece(Queen(0))
+    # chess_board.board[36].add_piece(Queen(0))
     return chess_board
 
 

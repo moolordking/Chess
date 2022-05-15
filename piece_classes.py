@@ -1,4 +1,6 @@
 
+from is_valid import *
+
 class Piece(object):
     def __init__(self, piece_type, col):
         self.piece_type = piece_type
@@ -44,25 +46,25 @@ class Rook(Piece):
     def valid_moves(self,chess_board):
         self.possible_valid_move_indices = []
 
-        for y in range(1,7):
+        for y in range(1,8):
             if self.check_empty_space(self.position, y*8, False, chess_board):
                 self.possible_valid_move_indices.append(self.position+(y*8))
-            if chess_board.board[self.position+(y*8)].piece_on_top:
+            if v_range(self.position+(y*8),0,64) and chess_board.board[self.position+(y*8)].piece_on_top:
                 break
-        for y in range(-1,-7,-1):
+        for y in range(-1,-8,-1):
             if self.check_empty_space(self.position, y*8, False, chess_board):
                 self.possible_valid_move_indices.append(self.position+(y*8))
-            if chess_board.board[self.position+(y*8)].piece_on_top:
+            if v_range(self.position+(y*8),0,64) and chess_board.board[self.position+(y*8)].piece_on_top:
                 break
-        for x in range(1,7):
+        for x in range(1,8):
             if self.check_empty_space(self.position, x, True, chess_board):
                 self.possible_valid_move_indices.append(self.position+x)
-            if chess_board.board[self.position+x].piece_on_top:
+            if v_range(self.position+x,0,64) and chess_board.board[self.position+x].piece_on_top:
                 break
-        for x in range(-1,-7,-1):
+        for x in range(-1,-8,-1):
             if self.check_empty_space(self.position, x, True, chess_board):
                 self.possible_valid_move_indices.append(self.position+x)
-            if chess_board.board[self.position+x].piece_on_top:
+            if v_range(self.position+x,0,64) and chess_board.board[self.position+x].piece_on_top:
                 break
 
         return self.possible_valid_move_indices
@@ -97,29 +99,29 @@ class Queen(Piece):
     def valid_moves(self,chess_board):
         self.possible_valid_move_indices = []
 
-        for y in range(1,7):
+        for y in range(1,8):
             if self.check_empty_space(self.position, y*8, False, chess_board):
                 self.possible_valid_move_indices.append(self.position+(y*8))
-            if chess_board.board[self.position+(y*8)].piece_on_top:
+            if v_range(self.position+(y*8),0,64) and chess_board.board[self.position+(y*8)].piece_on_top:
                 break
-        for y in range(-1,-7,-1):
+        for y in range(-1,-8,-1):
             if self.check_empty_space(self.position, y*8, False, chess_board):
                 self.possible_valid_move_indices.append(self.position+(y*8))
-            if chess_board.board[self.position+(y*8)].piece_on_top:
+            if v_range(self.position+(y*8),0,64) and chess_board.board[self.position+(y*8)].piece_on_top:
                 break
-        for x in range(1,7):
+        for x in range(1,8):
             if self.check_empty_space(self.position, x, True, chess_board):
                 self.possible_valid_move_indices.append(self.position+x)
-            if chess_board.board[self.position+x].piece_on_top:
+            if v_range(self.position+x,0,64) and chess_board.board[self.position+x].piece_on_top:
                 break
-        for x in range(-1,-7,-1):
+        for x in range(-1,-8,-1):
             if self.check_empty_space(self.position, x, True, chess_board):
                 self.possible_valid_move_indices.append(self.position+x)
-            if chess_board.board[self.position+x].piece_on_top:
+            if v_range(self.position+x,0,64) and chess_board.board[self.position+x].piece_on_top:
                 break
 
         for topright in range (1,7):
-            
+            pass
 
         return self.possible_valid_move_indices
 
