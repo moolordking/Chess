@@ -4,6 +4,12 @@ from tkinter import font
 # module for colours and graphics - including fonts
 from colours_and_graphics import *
 
+from game_page import *
+
+def load_game(root):
+    root.destroy()
+    create_game_gui()
+
 def create_gui():
     # create window
     root = Tk()
@@ -16,7 +22,7 @@ def create_gui():
     header_message.grid(row=0, column=0, columnspan=2, sticky="W", padx=240, pady=30)
 
     # display start button
-    start_button = Button(root, text="BEGIN", width=26, height=2)
+    start_button = Button(root, text="BEGIN", width=26, height=2, command=lambda: load_game(root))
     start_button.config(fg=get_colour(0), bg=get_colour(3), borderwidth=0)
     start_button_font = font.Font(family=get_font(), size=13, weight="bold")
     start_button['font'] = start_button_font
