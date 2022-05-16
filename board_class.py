@@ -52,8 +52,12 @@ class Board(object):
         self.board[0].add_piece(Rook(not(side)))
         self.board[1].add_piece(Knight(not(side)))
         self.board[2].add_piece(Bishop(not(side)))
-        self.board[3].add_piece(Queen(not(side)))
-        self.board[4].add_piece(King(not(side)))
+        if side == 0:
+            self.board[3].add_piece(Queen(not(side)))
+            self.board[4].add_piece(King(not(side)))
+        else:
+            self.board[4].add_piece(Queen(not(side)))
+            self.board[3].add_piece(King(not(side)))
         self.board[5].add_piece(Bishop(not(side)))
         self.board[6].add_piece(Knight(not(side)))
         self.board[7].add_piece(Rook(not(side)))
@@ -70,8 +74,12 @@ class Board(object):
         self.board[56].add_piece(Rook(side))
         self.board[57].add_piece(Knight(side))
         self.board[58].add_piece(Bishop(side))
-        self.board[59].add_piece(Queen(side))
-        self.board[60].add_piece(King(side))
+        if side == 0:
+            self.board[59].add_piece(Queen(side))
+            self.board[60].add_piece(King(side))
+        else:
+            self.board[60].add_piece(Queen(side))
+            self.board[59].add_piece(King(side))
         self.board[61].add_piece(Bishop(side))
         self.board[62].add_piece(Knight(side))
         self.board[63].add_piece(Rook(side))
@@ -88,9 +96,9 @@ class Board(object):
         self.canv.clear()
 
         for square in range(64):
-            if not(self.board[square].highlighted):
+            if not(self.board[square].highlighted) or (self.board[square].highlighted and not(self.board[square].piece_on_top)):
                 sq_col = ((square+(square//8))%2==0)*get_colour(4) or get_colour(5)
-                self.canv.c.create_rectangle(square%8*(self.board_width/8), square//8*(self.board_width/8), square%8*(self.board_width/8)+self.board_width/8, square//8*(self.board_width/8)+self.board_width/8, fill=sq_col, outline=get_colour(0))
+                self.canv.c.create_rectangle(square%8*(self.board_width/8), square//8*(self.board_width/8), square%8*(self.board_width/8)+self.board_width/8, square//8*(self.board_width/8)+self.board_width/8, fill=sq_col, outline="")
             else:
                 self.canv.c.create_rectangle(square%8*(self.board_width/8), square//8*(self.board_width/8), square%8*(self.board_width/8)+self.board_width/8, square//8*(self.board_width/8)+self.board_width/8, fill=get_colour(6), outline=get_colour(0))
 
