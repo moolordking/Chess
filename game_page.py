@@ -1,10 +1,12 @@
 
 import wx
 from tkinter import *
+from tkinter import font
 from PIL import Image, ImageTk
 # module for colours and graphics - including fonts
 from colours_and_graphics import *
 from board_class import *
+import random as r
 
 def get_all_moves_from_side(side,chess_board):
     arr = []
@@ -30,18 +32,34 @@ class Board_Canvas(object):
             self.c.create_image(image[0],image[1],image=image[2])
         self.display_text()
     def display_text(self):
+
+        button_font = font.Font(family=get_font(), size=13, weight="bold")
+        piece_set_button = Button(self.root, text="Piece Set", width=10, height=2, command=lambda: change_piece_set(self.chess_board))
+        piece_set_button.config(fg=get_colour(4), bg=get_colour(6), borderwidth=0)
+        piece_set_button['font'] = button_font
+        piece_set_button.pack(side=RIGHT, padx=self.board_width*0.02)
+
         if self.chess_board:
             self.eval_text_value.set(str(self.chess_board.eval))
-        self.eval_text.pack(side=RIGHT, padx=self.board_width*0.25)
+        self.eval_text.pack(side=RIGHT, padx=self.board_width*0.01)
 
     def clear(self, what="all"):
         self.images = []
         self.c.delete(what)
 
+def change_piece_set(chess_board):
+    sets = ["classic", "rabisco", "tyke"]
+    index = (sets.index(chess_board.piece_set)+1)%len(sets)
+    chess_board.piece_set = sets[index]
+    chess_board.display_board()
+
 def clicked(event, board_width, chess_board, c):
     ix = int(event.x//(board_width/8))
     iy = int(event.y//(board_width/8))
     index = ix + iy * 8
+
+    if event.x > board_width or event.y > board_width:
+        return
 
     if index in chess_board.current_valid_moves:
         chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
@@ -100,4 +118,4 @@ def create_board(canv,board_width,side=0):
 
 
 if __name__ == "__main__":
-    create_game_gui()
+    create_game_gui(int(r.random()*2))

@@ -39,6 +39,7 @@ def check_if_move_valid(move, index, chess_board):
 
 class Board(object):
     def __init__(self, canv=None, board_width=500):
+        self.piece_set = "classic"
         self.board = [None] * 64
         self.current_side = 0
         self.player_side = 0
@@ -156,7 +157,7 @@ class Board(object):
             x = index%8*(self.board_width/8)+(self.board_width/16)
             y = index//8*(self.board_width/8)+(self.board_width/16)
             if square.piece_on_top:
-                piece = Image.open("pieces/lq/"+square.piece_on_top.get_piece_image())
+                piece = Image.open(f"pieces/{self.piece_set}/"+square.piece_on_top.get_piece_image())
                 piece = piece.resize((self.board_width//11,self.board_width//11), Image.ANTIALIAS)
                 piece = ImageTk.PhotoImage(piece)
                 self.canv.images.append([x,y,piece])
