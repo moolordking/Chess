@@ -9,6 +9,7 @@ class Piece(object):
         self.value = 0
         self.moved = False
         self.possible_valid_move_indices = []
+        self.current_allowed_moves = []
     def set_position(self,pos):
         self.position = pos
     def show_moves(self):
@@ -254,17 +255,15 @@ class Pawn(Piece):
         nop = 1
         if self.col == 1 and chess_board.player_side == 0:
             nop = -1
-        if self.col == 1 and chess_board.player_side == 1:
-            nop = 1
         if self.col == 0 and chess_board.player_side == 1:
             nop = -1
-        if not(chess_board.board[self.position-(8*nop)].piece_on_top):
+        if v_range(self.position-(8*nop), 0, 64) and not(chess_board.board[self.position-(8*nop)].piece_on_top):
             self.possible_valid_move_indices.append(self.position-(8*nop))
-            if not(chess_board.board[self.position-(16*nop)].piece_on_top) and not(self.moved):
+            if v_range(self.position-(16*nop), 0, 64) and not(chess_board.board[self.position-(16*nop)].piece_on_top) and not(self.moved):
                 self.possible_valid_move_indices.append(self.position-(16*nop))
-        if chess_board.board[self.position-(9*nop)].piece_on_top and chess_board.board[self.position-(9*nop)].piece_on_top.col != self.col:
+        if v_range(self.position-(9*nop), 0, 64) and chess_board.board[self.position-(9*nop)].piece_on_top and chess_board.board[self.position-(9*nop)].piece_on_top.col != self.col:
             self.possible_valid_move_indices.append(self.position-(9*nop))
-        if chess_board.board[self.position-(7*nop)].piece_on_top and chess_board.board[self.position-(7*nop)].piece_on_top.col != self.col:
+        if v_range(self.position-(7*nop), 0, 64) and chess_board.board[self.position-(7*nop)].piece_on_top and chess_board.board[self.position-(7*nop)].piece_on_top.col != self.col:
             self.possible_valid_move_indices.append(self.position-(7*nop))
 
         return self.possible_valid_move_indices
