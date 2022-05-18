@@ -7,13 +7,16 @@ from PIL import Image, ImageTk
 from colours_and_graphics import *
 from board_class import *
 import random as r
+from show_messages import *
 
-def get_all_moves_from_side(side,chess_board):
+def get_all_moves_from_side(side,chess_board, check_for_empty=False):
     arr = []
     for side_square in chess_board.board:
         if side_square.piece_on_top and side_square.piece_on_top.col == side:
             for move in side_square.piece_on_top.valid_moves(chess_board):
                     if check_if_move_valid(move,side_square.position,chess_board):
+                        if check_for_empty:
+                            return ["not empty"]
                         arr.append(move)
     return arr
 
@@ -55,6 +58,13 @@ def change_piece_set(chess_board):
     chess_board.piece_set = sets[index]
     chess_board.display_board()
 
+def check_for_checkmate(chess_board):
+    for square in range(64):
+        if chess_board.board[square].piece_on_top and chess_board.board[square].piece_on_top.col == chess_board.current_side:
+            if len(chess_board.board[square].piece_on_top.current_allowed_moves)>1:
+                return False
+    return True
+
 def clicked(event, board_width, chess_board, c):
     ix = int(event.x//(board_width/8))
     iy = int(event.y//(board_width/8))
@@ -66,8 +76,14 @@ def clicked(event, board_width, chess_board, c):
     if index in chess_board.current_valid_moves:
         chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
         chess_board.calculate_current_side_moves()
-        if get_all_moves_from_side(1, chess_board):
-            
+
+        # check if checkmate
+        checkmate = check_for_checkmate(chess_board)
+        if checkmate:
+            winner = (not(chess_board.current_side) * "black") or "white"
+            s_message(f"{winner} wins", "checkmate", 2)
+            chess_board.current_side = 2
+
         # print(chess_board.eval)
     chess_board.current_valid_moves = []
 
