@@ -16,7 +16,7 @@ def get_all_moves_from_side(side,chess_board, check_for_empty=False):
             for move in side_square.piece_on_top.valid_moves(chess_board):
                     if check_if_move_valid(move,side_square.position,chess_board):
                         if check_for_empty:
-                            return ["not empty"]
+                            return False
                         arr.append(move)
     return arr
 
