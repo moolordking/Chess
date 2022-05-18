@@ -12,7 +12,9 @@ def get_all_moves_from_side(side,chess_board):
     arr = []
     for side_square in chess_board.board:
         if side_square.piece_on_top and side_square.piece_on_top.col == side:
-            arr.append(side_square.piece_on_top.valid_moves(chess_board))
+            for move in side_square.piece_on_top.valid_moves(chess_board):
+                    if check_if_move_valid(move,side_square.position,chess_board):
+                        arr.append(move)
     return arr
 
 class Board_Canvas(object):
@@ -64,6 +66,8 @@ def clicked(event, board_width, chess_board, c):
     if index in chess_board.current_valid_moves:
         chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
         chess_board.calculate_current_side_moves()
+        if get_all_moves_from_side(1, chess_board):
+            
         # print(chess_board.eval)
     chess_board.current_valid_moves = []
 
