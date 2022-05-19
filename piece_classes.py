@@ -238,7 +238,27 @@ class King(Piece):
             self.possible_valid_move_indices.append(self.position+9)
         if self.check_empty_space(self.position, +7, False, chess_board, 1, 1):
             self.possible_valid_move_indices.append(self.position+7)
-            
+
+        #castling
+        if not(self.moved):
+            if self.check_empty_space(self.position, +2, True, chess_board):
+                if self.check_empty_space(self.position, +1, True, chess_board):
+                    if chess_board.board[self.position+3].piece_on_top and not(chess_board.board[self.position+3].piece_on_top.moved):
+                        if chess_board.board[self.position+3].piece_on_top.piece_type.lower() == "rook":
+                            self.possible_valid_move_indices.append(self.position+2)
+                    elif chess_board.board[self.position+4].piece_on_top and not(chess_board.board[self.position+4].piece_on_top.moved):
+                        if chess_board.board[self.position+4].piece_on_top.piece_type.lower() == "rook":
+                            self.possible_valid_move_indices.append(self.position+2)
+            if self.check_empty_space(self.position, -2, True, chess_board):
+                if self.check_empty_space(self.position, -1, True, chess_board):
+                    if chess_board.board[self.position-3].piece_on_top and not(chess_board.board[self.position-3].piece_on_top.moved):
+                        if chess_board.board[self.position-3].piece_on_top.piece_type.lower() == "rook":
+                            self.possible_valid_move_indices.append(self.position-2)
+                    elif chess_board.board[self.position-4].piece_on_top and not(chess_board.board[self.position-4].piece_on_top.moved):
+                        if chess_board.board[self.position-4].piece_on_top.piece_type.lower() == "rook":
+                            self.possible_valid_move_indices.append(self.position-2)
+
+
         return self.possible_valid_move_indices
 
 class Pawn(Piece):

@@ -78,8 +78,9 @@ class Board(object):
                     if check_if_move_valid(move,square,self):
                         self.board[square].piece_on_top.current_allowed_moves.append(move)
 
-    def move_piece(self,sq_one,sq_two):
-        self.current_side = not(self.current_side)
+    def move_piece(self,sq_one,sq_two, next_side=True):
+        if next_side:
+            self.current_side = not(self.current_side)
         sq_two.add_piece(sq_one.piece_on_top)
         sq_two.piece_on_top.moved = True
         sq_one.remove_piece()
