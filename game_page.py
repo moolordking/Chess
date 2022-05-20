@@ -76,19 +76,19 @@ def perform_move(index, chess_board):
                 if check_if_move_valid(index-1, index-2, chess_board):
                     if not(chess_board.current_highlighted.piece_on_top.moved):
                         if chess_board.board[index+1].piece_on_top and chess_board.board[index+1].piece_on_top.piece_type.lower() == "rook" and not(chess_board.board[index+1].piece_on_top.moved):
-                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], False)
+                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
                             chess_board.move_piece(chess_board.board[index+1], chess_board.board[index-1])
                         elif chess_board.board[index+2].piece_on_top.piece_type.lower() == "rook" and not(chess_board.board[index+2].piece_on_top.moved):
-                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], False)
+                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
                             chess_board.move_piece(chess_board.board[index+2], chess_board.board[index-1])
             elif index == chess_board.current_highlighted.position - 2:
                 if check_if_move_valid(index+1, index+2, chess_board):
                     if not(chess_board.current_highlighted.piece_on_top.moved):
                         if chess_board.board[index-1].piece_on_top and chess_board.board[index-1].piece_on_top.piece_type.lower() == "rook" and not(chess_board.board[index-1].piece_on_top.moved):
-                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], False)
+                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
                             chess_board.move_piece(chess_board.board[index-1], chess_board.board[index+1])
                         elif chess_board.board[index-2].piece_on_top.piece_type.lower() == "rook" and not(chess_board.board[index-2].piece_on_top.moved):
-                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], False)
+                            chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
                             chess_board.move_piece(chess_board.board[index-2], chess_board.board[index+1])
         else:
             chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
@@ -101,6 +101,8 @@ def perform_move(index, chess_board):
             winner = (not(chess_board.current_side) * "black") or "white"
             s_message(f"{winner} wins", "checkmate", 2)
             chess_board.current_side = 2
+
+        print(chess_board.moves[len(chess_board.moves)-1])
 
 def clicked(event, board_width, chess_board, c):
     ix = int(event.x//(board_width/8))

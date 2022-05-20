@@ -21,17 +21,17 @@ class Piece(object):
     def check_empty_space(self, position, num, leftordown, chess_board, expected=0, diagonal=False):
         if diagonal:
             if num<0:
-                return position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 == ((position//8)-(diagonal))
+                return position+num>=0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 == ((position//8)-(diagonal))
             else:
                 return position+num<64 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col) and ((position+num)//8 != (position)//8) and (position+num)//8 == ((position//8)+(diagonal))
         elif leftordown:
             if num<0:
-                return ((position+num)//8 == (position)//8)+expected and position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
+                return ((position+num)//8 == (position)//8)+expected and position+num>=0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
             else:
                 return ((position+num)//8 == (position)//8)+expected and position+num<64 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
         else:
             if num<0:
-                return ((position+num)%8 == (position)%8)+expected and position+num>0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
+                return ((position+num)%8 == (position)%8)+expected and position+num>=0 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
             else:
                 return ((position+num)%8 == (position)%8)+expected and position+num<64 and (not(chess_board.board[position+num].piece_on_top) or chess_board.board[position+num].piece_on_top.col != self.col)
 

@@ -49,6 +49,7 @@ class Board(object):
         self.current_valid_moves = []
         self.eval = 0
         self.currently_in_check = False
+        self.moves = []
         for index in range(64):
             self.board[index] = Square(index, ((index+(index//8))%2!=0)*1)
 
@@ -61,7 +62,7 @@ class Board(object):
                 if self.board[(i+j*8)].piece_on_top != None:
                     square_piece = self.board[(i+j*8)].piece_on_top.piece_type
                     if square_piece.lower() == "knight":
-                        square_piece = "night"
+                        square_piece = self.board[(i+j*8)].piece_on_top.piece_type[1::]
                     current_pieces += "["+square_piece[0]+"]"
                 elif (i+j)%2==0:
                     current_pieces += "[#]"
@@ -78,9 +79,28 @@ class Board(object):
                     if check_if_move_valid(move,square,self):
                         self.board[square].piece_on_top.current_allowed_moves.append(move)
 
+    def index_to_chess_notation(self, index):
+        files = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        ranks = [1,2,3,4,5,6,7,8]
+        if self.player_side == 0:
+            return files[index % 8] + str(ranks[7-(index // 8)])
+        elif self.player_side == 1:
+            return files[7-(index % 8)] + str(ranks[index // 8])
+
     def move_piece(self,sq_one,sq_two, next_side=True):
-        if next_side:
+        if next_side == True:
             self.current_side = not(self.current_side)
+            original_pos = self.index_to_chess_notation(sq_one.position)
+            middle_bit = " "
+            if sq_two.piece_on_top:
+                middle_bit = "x"
+            new_pos = self.index_to_chess_notation(sq_two.position)
+            self.moves.append(original_pos + middle_bit + new_pos)
+        elif next_side == "o-o" or next_side == "o-o-o":
+            if self.current_side == 0:
+                self.moves.append(next_side.replace("o", "O"))
+            else:
+                self.moves.append(next_side)
         sq_two.add_piece(sq_one.piece_on_top)
         sq_two.piece_on_top.moved = True
         sq_one.remove_piece()
