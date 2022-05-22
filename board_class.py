@@ -50,6 +50,7 @@ class Board(object):
         self.eval = 0
         self.currently_in_check = False
         self.moves = []
+        self.next_move_dont_add = False
         for index in range(64):
             self.board[index] = Square(index, ((index+(index//8))%2!=0)*1)
 
@@ -88,19 +89,23 @@ class Board(object):
             return files[7-(index % 8)] + str(ranks[index // 8])
 
     def move_piece(self,sq_one,sq_two, next_side=True):
-        if next_side == True:
-            self.current_side = not(self.current_side)
-            original_pos = self.index_to_chess_notation(sq_one.position)
-            middle_bit = " "
-            if sq_two.piece_on_top:
-                middle_bit = "x"
-            new_pos = self.index_to_chess_notation(sq_two.position)
-            self.moves.append(original_pos + middle_bit + new_pos)
-        elif next_side == "o-o" or next_side == "o-o-o":
+        if next_side == "o-o" or next_side == "o-o-o":
             if self.current_side == 0:
                 self.moves.append(next_side.replace("o", "O"))
             else:
                 self.moves.append(next_side)
+            self.next_move_dont_add = True
+        else:
+            self.current_side = not(self.current_side)
+            if not(self.next_move_dont_add):
+                original_pos = self.index_to_chess_notation(sq_one.position)
+                middle_bit = " "
+                if sq_two.piece_on_top:
+                    middle_bit = " x "
+                new_pos = self.index_to_chess_notation(sq_two.position)
+                self.moves.append(original_pos + middle_bit + new_pos)
+            else:
+                self.next_move_dont_add = False
         sq_two.add_piece(sq_one.piece_on_top)
         sq_two.piece_on_top.moved = True
         sq_one.remove_piece()

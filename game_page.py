@@ -98,7 +98,8 @@ def perform_move(index, chess_board):
         # check if checkmate
         checkmate = check_for_checkmate(chess_board)
         if checkmate:
-            winner = (not(chess_board.current_side) * "black") or "white"
+            winner = "white"
+            if chess_board.current_side == 0 : winner = "black"
             s_message(f"{winner} wins", "checkmate", 2)
             chess_board.current_side = 2
 
