@@ -9,17 +9,6 @@ from board_class import *
 import random as r
 from show_messages import *
 
-def get_all_moves_from_side(side,chess_board, check_for_empty=False):
-    arr = []
-    for side_square in chess_board.board:
-        if side_square.piece_on_top and side_square.piece_on_top.col == side:
-            for move in side_square.piece_on_top.valid_moves(chess_board):
-                if check_if_move_valid(move,side_square.position,chess_board):
-                    if check_for_empty:
-                        return False
-                    arr.append(move)
-    return arr
-
 class Board_Canvas(object):
     def __init__(self,root,board_width):
         self.c = Canvas(root,bg=get_colour(0), bd=0, highlightthickness=0, height=board_width, width=board_width)

@@ -2,6 +2,22 @@
 from square_class import *
 from colours_and_graphics import *
 from PIL import Image, ImageTk
+import random as r
+
+def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_of_pieces=False):
+    arr = []
+    for side_square in chess_board.board:
+        if side_square.piece_on_top and side_square.piece_on_top.col == side:
+            if not(get_index_of_pieces):
+                for move in side_square.piece_on_top.valid_moves(chess_board):
+                    if check_if_move_valid(move,side_square.position,chess_board):
+                        if check_for_empty:
+                            return False
+                        arr.append(move)
+            else:
+                if len(side_square.piece_on_top.valid_moves(chess_board))>0:
+                    arr.append(side_square)
+    return arr
 
 def check_if_move_valid(move, index, chess_board):
     king_can_be_taken = False
@@ -111,6 +127,35 @@ class Board(object):
         sq_one.remove_piece()
         self.evaluate_position()
 
+    def ai_move(self):
+        squares_with_moves = []
+        enemy_moves = get_all_moves_from_side(self.player_side, self)
+        for square in get_all_moves_from_side(self.current_side, self, False, True):
+            squares_with_moves.append(square)
+        ran_sq = r.choice(squares_with_moves)
+        chosen_squares = [ran_sq, ran_sq]
+        chosen_moves = [False, False]
+        for square in squares_with_moves:
+            if square.position in enemy_moves:
+                if not(chosen_moves[1]) or (square.piece_on_top.value>=chosen_squares[1].piece_on_top.value):
+                    chosen_squares[1] = square
+                    chosen_moves[1] = r.choice(square.piece_on_top.valid_moves(self))
+            for move in square.piece_on_top.valid_moves(self):
+                if self.board[move].piece_on_top:
+                    if not(chosen_moves[0]) or (self.board[move].piece_on_top.value>=self.board[chosen_moves[0]].piece_on_top.value):
+                        chosen_square = square
+                        chosen_move = move
+                        break
+
+        if not(chosen_moves[0]):
+            chosen_moves[0] = r.choice(chosen_squares[0].piece_on_top.valid_moves(self))
+        if chosen_moves[1] and (not(self.board[chosen_moves[0]].piece_on_top) or(chosen_squares[1].piece_on_top.value>self.board[chosen_moves[0]].piece_on_top.value)):
+            self.move_piece(chosen_squares[1], self.board[chosen_moves[1]])
+        else:
+            self.move_piece(chosen_squares[0], self.board[chosen_moves[0]])
+        self.display_board()
+        self.calculate_current_side_moves()
+
     def evaluate_position(self):
         evaluation = 0
         for square in self.board:
@@ -120,6 +165,7 @@ class Board(object):
                 else:
                     evaluation -= square.piece_on_top.value
         self.eval = evaluation
+
     def set_up(self, side=0):
         self.player_side = side
         # opposing side
@@ -189,13 +235,15 @@ class Board(object):
                 self.canv.images.append([x,y,piece])
         self.canv.display()
 
-        if len(possible_moves)>0 and self.current_highlighted.piece_on_top.col == self.current_side: #and self.current_highlighted.piece_on_top.col == self.player_side:
+        if len(possible_moves)>0 and self.current_highlighted.piece_on_top.col == self.current_side and self.current_highlighted.piece_on_top.col == self.player_side:
             for move in possible_moves:
                 if not(self.board[move].piece_on_top):
                     self.canv.c.create_rectangle((self.board_width/10)/2+move%8*(self.board_width/8), (self.board_width/10)/2+move//8*(self.board_width/8), move%8*(self.board_width/8)+self.board_width/8-self.board_width/20, move//8*(self.board_width/8)+self.board_width/8-self.board_width/20, fill=get_colour(7), outline="")
                 else:
                     self.canv.c.create_rectangle(move%8*(self.board_width/8), move//8*(self.board_width/8), move%8*(self.board_width/8)+self.board_width/8, move//8*(self.board_width/8)+self.board_width/8, fill="", outline=get_colour(8))
                 self.current_valid_moves.append(move)
+        elif self.current_side != self.player_side:
+            self.ai_move()
 
 
 if __name__ == "__main__":
