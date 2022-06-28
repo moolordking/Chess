@@ -3,6 +3,57 @@ from square_class import *
 from colours_and_graphics import *
 from PIL import Image, ImageTk
 import random as r
+from show_messages import *
+
+def check_for_checkmate(chess_board):
+    for square in range(64):
+        if chess_board.board[square].piece_on_top and chess_board.board[square].piece_on_top.col == chess_board.current_side:
+            if len(chess_board.board[square].piece_on_top.current_allowed_moves)>0:
+                return False
+    return True
+
+def perform_move(index, chess_board):
+    # castling checks
+    if chess_board.current_highlighted.piece_on_top.piece_type.lower() == "king" and (
+            index == chess_board.current_highlighted.position + 2 or index == chess_board.current_highlighted.position - 2):
+        if index == chess_board.current_highlighted.position + 2:
+            if check_if_move_valid(index - 1, index - 2, chess_board):
+                if not (chess_board.current_highlighted.piece_on_top.moved):
+                    if chess_board.board[index + 1].piece_on_top and chess_board.board[
+                        index + 1].piece_on_top.piece_type.lower() == "rook" and not (
+                    chess_board.board[index + 1].piece_on_top.moved):
+                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
+                        chess_board.move_piece(chess_board.board[index + 1], chess_board.board[index - 1])
+                    elif chess_board.board[index + 2].piece_on_top.piece_type.lower() == "rook" and not (
+                    chess_board.board[index + 2].piece_on_top.moved):
+                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
+                        chess_board.move_piece(chess_board.board[index + 2], chess_board.board[index - 1])
+        elif index == chess_board.current_highlighted.position - 2:
+            if check_if_move_valid(index + 1, index + 2, chess_board):
+                if not (chess_board.current_highlighted.piece_on_top.moved):
+                    if chess_board.board[index - 1].piece_on_top and chess_board.board[
+                        index - 1].piece_on_top.piece_type.lower() == "rook" and not (
+                    chess_board.board[index - 1].piece_on_top.moved):
+                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
+                        chess_board.move_piece(chess_board.board[index - 1], chess_board.board[index + 1])
+                    elif chess_board.board[index - 2].piece_on_top.piece_type.lower() == "rook" and not (
+                    chess_board.board[index - 2].piece_on_top.moved):
+                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
+                        chess_board.move_piece(chess_board.board[index - 2], chess_board.board[index + 1])
+    else:
+        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
+
+    chess_board.calculate_current_side_moves()
+
+    # check if checkmate
+    checkmate = check_for_checkmate(chess_board)
+    if checkmate:
+        winner = "white"
+        if chess_board.current_side == 0: winner = "black"
+        s_message(f"{winner} wins", "checkmate", 2)
+        chess_board.current_side = 2
+
+    print(chess_board.moves[len(chess_board.moves) - 1])
 
 def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_of_pieces=False):
     arr = []
@@ -138,22 +189,38 @@ class Board(object):
         for square in squares_with_moves:
             if square.position in enemy_moves:
                 if not(chosen_moves[1]) or (square.piece_on_top.value>=chosen_squares[1].piece_on_top.value):
-                    chosen_squares[1] = square
-                    chosen_moves[1] = r.choice(square.piece_on_top.valid_moves(self))
+                    for move in square.piece_on_top.valid_moves(self):
+                        if check_if_move_valid(move,square.position,self):
+                            chosen_squares[1] = square
+                            chosen_moves[1] = move
+                            break
             for move in square.piece_on_top.valid_moves(self):
                 if self.board[move].piece_on_top:
                     if not(chosen_moves[0]) or (self.board[move].piece_on_top.value>=self.board[chosen_moves[0]].piece_on_top.value):
-                        chosen_square = square
-                        chosen_move = move
-                        break
+                        if check_if_move_valid(move,square.position,self):
+                            chosen_square = square
+                            chosen_move = move
+                            break
+
+        to_highlight = False
 
         if not(chosen_moves[0]):
             chosen_moves[0] = r.choice(chosen_squares[0].piece_on_top.valid_moves(self))
-        if chosen_moves[1] and (not(self.board[chosen_moves[0]].piece_on_top) or(chosen_squares[1].piece_on_top.value>self.board[chosen_moves[0]].piece_on_top.value)):
-            self.move_piece(chosen_squares[1], self.board[chosen_moves[1]])
+        if chosen_moves[1]: #and (not(self.board[chosen_moves[0]].piece_on_top) or(chosen_squares[1].piece_on_top.value>self.board[chosen_moves[0]].piece_on_top.value)):
+            self.current_highlighted = chosen_squares[1]
+            perform_move(chosen_moves[1],self)
+            to_highlight = chosen_moves[1]
         else:
-            self.move_piece(chosen_squares[0], self.board[chosen_moves[0]])
-        self.display_board()
+            self.current_highlighted = chosen_squares[0]
+            perform_move(chosen_moves[0], self)
+            to_highlight = chosen_moves[0]
+
+        if self.current_highlighted:
+            self.current_highlighted.highlighted = False
+
+        self.board[to_highlight].highlighted = True
+        self.current_highlighted = self.board[to_highlight]
+        self.display_board([],True)
         self.calculate_current_side_moves()
 
     def evaluate_position(self):
@@ -214,20 +281,26 @@ class Board(object):
 
         self.calculate_current_side_moves()
 
-    def display_board(self, possible_moves=[]):
+    def display_board(self, possible_moves=[], enemy_move=False):
         self.canv.clear()
 
         for square in range(64):
             if not(self.board[square].highlighted) or (self.board[square].highlighted and not(self.board[square].piece_on_top)):
                 sq_col = ((square+(square//8))%2==0)*get_colour(4) or get_colour(5)
                 self.canv.c.create_rectangle(square%8*(self.board_width/8), square//8*(self.board_width/8), square%8*(self.board_width/8)+self.board_width/8, square//8*(self.board_width/8)+self.board_width/8, fill=sq_col, outline="")
-            else:
+            elif not(enemy_move):
                 self.canv.c.create_rectangle(square%8*(self.board_width/8), square//8*(self.board_width/8), square%8*(self.board_width/8)+self.board_width/8, square//8*(self.board_width/8)+self.board_width/8, fill=get_colour(6), outline=get_colour(0))
+            else:
+                self.canv.c.create_rectangle(square % 8 * (self.board_width / 8), square // 8 * (self.board_width / 8),
+                                             square % 8 * (self.board_width / 8) + self.board_width / 8,
+                                             square // 8 * (self.board_width / 8) + self.board_width / 8,
+                                             fill=get_colour(1), outline=get_colour(0))
 
         for index in range(64):
             square = self.board[index]
             x = index%8*(self.board_width/8)+(self.board_width/16)
             y = index//8*(self.board_width/8)+(self.board_width/16)
+            self.board[index].highlighted = False
             if square.piece_on_top:
                 piece = Image.open(f"pieces/{self.piece_set}/"+square.piece_on_top.get_piece_image())
                 piece = piece.resize((self.board_width//11,self.board_width//11), Image.ANTIALIAS)
@@ -242,7 +315,7 @@ class Board(object):
                 else:
                     self.canv.c.create_rectangle(move%8*(self.board_width/8), move//8*(self.board_width/8), move%8*(self.board_width/8)+self.board_width/8, move//8*(self.board_width/8)+self.board_width/8, fill="", outline=get_colour(8))
                 self.current_valid_moves.append(move)
-        elif self.current_side != self.player_side:
+        elif self.current_side != self.player_side and self.current_side<2:
             self.ai_move()
 
 
