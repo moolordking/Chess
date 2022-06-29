@@ -3,57 +3,7 @@ from square_class import *
 from colours_and_graphics import *
 from PIL import Image, ImageTk
 import random as r
-from show_messages import *
-
-def check_for_checkmate(chess_board):
-    for square in range(64):
-        if chess_board.board[square].piece_on_top and chess_board.board[square].piece_on_top.col == chess_board.current_side:
-            if len(chess_board.board[square].piece_on_top.current_allowed_moves)>0:
-                return False
-    return True
-
-def perform_move(index, chess_board):
-    # castling checks
-    if chess_board.current_highlighted.piece_on_top.piece_type.lower() == "king" and (
-            index == chess_board.current_highlighted.position + 2 or index == chess_board.current_highlighted.position - 2):
-        if index == chess_board.current_highlighted.position + 2:
-            if check_if_move_valid(index - 1, index - 2, chess_board):
-                if not (chess_board.current_highlighted.piece_on_top.moved):
-                    if chess_board.board[index + 1].piece_on_top and chess_board.board[
-                        index + 1].piece_on_top.piece_type.lower() == "rook" and not (
-                    chess_board.board[index + 1].piece_on_top.moved):
-                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
-                        chess_board.move_piece(chess_board.board[index + 1], chess_board.board[index - 1])
-                    elif chess_board.board[index + 2].piece_on_top.piece_type.lower() == "rook" and not (
-                    chess_board.board[index + 2].piece_on_top.moved):
-                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
-                        chess_board.move_piece(chess_board.board[index + 2], chess_board.board[index - 1])
-        elif index == chess_board.current_highlighted.position - 2:
-            if check_if_move_valid(index + 1, index + 2, chess_board):
-                if not (chess_board.current_highlighted.piece_on_top.moved):
-                    if chess_board.board[index - 1].piece_on_top and chess_board.board[
-                        index - 1].piece_on_top.piece_type.lower() == "rook" and not (
-                    chess_board.board[index - 1].piece_on_top.moved):
-                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o")
-                        chess_board.move_piece(chess_board.board[index - 1], chess_board.board[index + 1])
-                    elif chess_board.board[index - 2].piece_on_top.piece_type.lower() == "rook" and not (
-                    chess_board.board[index - 2].piece_on_top.moved):
-                        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index], "o-o-o")
-                        chess_board.move_piece(chess_board.board[index - 2], chess_board.board[index + 1])
-    else:
-        chess_board.move_piece(chess_board.current_highlighted, chess_board.board[index])
-
-    chess_board.calculate_current_side_moves()
-
-    # check if checkmate
-    checkmate = check_for_checkmate(chess_board)
-    if checkmate:
-        winner = "white"
-        if chess_board.current_side == 0: winner = "black"
-        s_message(f"{winner} wins", "checkmate", 2)
-        chess_board.current_side = 2
-
-    print(chess_board.moves[len(chess_board.moves) - 1])
+from validate_potential_moves import *
 
 def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_of_pieces=False):
     arr = []
@@ -61,7 +11,7 @@ def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_o
         if side_square.piece_on_top and side_square.piece_on_top.col == side:
             if not(get_index_of_pieces):
                 for move in side_square.piece_on_top.valid_moves(chess_board):
-                    if check_if_move_valid(move,side_square.position,chess_board):
+                    if chess_board.check_if_move_valid(move,side_square.position,chess_board):
                         if check_for_empty:
                             return False
                         arr.append(move)
@@ -69,40 +19,6 @@ def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_o
                 if len(side_square.piece_on_top.valid_moves(chess_board))>0:
                     arr.append(side_square)
     return arr
-
-def check_if_move_valid(move, index, chess_board):
-    king_can_be_taken = False
-
-    for enemy_square in chess_board.board:
-        if enemy_square.piece_on_top and enemy_square.piece_on_top.col != chess_board.board[index].piece_on_top.col:
-            temp_board = Board()
-            for i,square in enumerate(chess_board.board):
-                if square.piece_on_top:
-                    if square.piece_on_top.piece_type.lower() == "pawn":
-                        temp_board.board[i].add_piece(Pawn(square.piece_on_top.col))
-                    if square.piece_on_top.piece_type.lower() == "rook":
-                        temp_board.board[i].add_piece(Rook(square.piece_on_top.col))
-                    if square.piece_on_top.piece_type.lower() == "knight":
-                        temp_board.board[i].add_piece(Knight(square.piece_on_top.col))
-                    if square.piece_on_top.piece_type.lower() == "queen":
-                        temp_board.board[i].add_piece(Queen(square.piece_on_top.col))
-                    if square.piece_on_top.piece_type.lower() == "king":
-                        temp_board.board[i].add_piece(King(square.piece_on_top.col))
-                    if square.piece_on_top.piece_type.lower() == "bishop":
-                        temp_board.board[i].add_piece(Bishop(square.piece_on_top.col))
-            temp_board.move_piece(temp_board.board[index], temp_board.board[move])
-            for i,square in enumerate(temp_board.board):
-                if square.piece_on_top and square.piece_on_top.piece_type.lower() == "king" and square.piece_on_top.col == chess_board.board[index].piece_on_top.col:
-                    king_location = i
-            for enemy_move in enemy_square.piece_on_top.valid_moves(temp_board):
-                temp_board.evaluate_position()
-                if enemy_move == king_location and (temp_board.eval>500 or temp_board.eval<500) and temp_board.board[enemy_square.position].piece_on_top.col != chess_board.board[index].piece_on_top.col:
-                    king_can_be_taken = True
-                    break
-            if king_can_be_taken:
-                break
-    if not(king_can_be_taken):
-        return True
 
 class Board(object):
     def __init__(self, canv=None, board_width=500):
@@ -144,7 +60,7 @@ class Board(object):
             if self.board[square].piece_on_top and self.board[square].piece_on_top.col == self.current_side:
                 self.board[square].piece_on_top.current_allowed_moves = []
                 for move in self.board[square].piece_on_top.valid_moves(self):
-                    if check_if_move_valid(move,square,self):
+                    if self.check_if_move_valid(move,square,self):
                         self.board[square].piece_on_top.current_allowed_moves.append(move)
 
     def index_to_chess_notation(self, index):
@@ -179,6 +95,7 @@ class Board(object):
         self.evaluate_position()
 
     def ai_move(self):
+        self.calculate_current_side_moves()
         squares_with_moves = []
         enemy_moves = get_all_moves_from_side(self.player_side, self)
         for square in get_all_moves_from_side(self.current_side, self, False, True):
@@ -190,17 +107,17 @@ class Board(object):
             if square.position in enemy_moves:
                 if not(chosen_moves[1]) or (square.piece_on_top.value>=chosen_squares[1].piece_on_top.value):
                     for move in square.piece_on_top.valid_moves(self):
-                        if check_if_move_valid(move,square.position,self):
+                        if self.check_if_move_valid(move,square.position,self):
                             chosen_squares[1] = square
                             chosen_moves[1] = move
-                            break
+                            if self.board[move].piece_on_top:
+                                break
             for move in square.piece_on_top.valid_moves(self):
                 if self.board[move].piece_on_top:
                     if not(chosen_moves[0]) or (self.board[move].piece_on_top.value>=self.board[chosen_moves[0]].piece_on_top.value):
-                        if check_if_move_valid(move,square.position,self):
+                        if self.check_if_move_valid(move,square.position,self):
                             chosen_square = square
                             chosen_move = move
-                            break
 
         to_highlight = False
 
@@ -232,6 +149,43 @@ class Board(object):
                 else:
                     evaluation -= square.piece_on_top.value
         self.eval = evaluation
+
+    def check_if_move_valid(self, move, index, chess_board):
+        king_can_be_taken = False
+
+        for enemy_square in chess_board.board:
+            if enemy_square.piece_on_top and enemy_square.piece_on_top.col != chess_board.board[index].piece_on_top.col:
+                temp_board = Board()
+                for i, square in enumerate(chess_board.board):
+                    if square.piece_on_top:
+                        if square.piece_on_top.piece_type.lower() == "pawn":
+                            temp_board.board[i].add_piece(Pawn(square.piece_on_top.col))
+                        if square.piece_on_top.piece_type.lower() == "rook":
+                            temp_board.board[i].add_piece(Rook(square.piece_on_top.col))
+                        if square.piece_on_top.piece_type.lower() == "knight":
+                            temp_board.board[i].add_piece(Knight(square.piece_on_top.col))
+                        if square.piece_on_top.piece_type.lower() == "queen":
+                            temp_board.board[i].add_piece(Queen(square.piece_on_top.col))
+                        if square.piece_on_top.piece_type.lower() == "king":
+                            temp_board.board[i].add_piece(King(square.piece_on_top.col))
+                        if square.piece_on_top.piece_type.lower() == "bishop":
+                            temp_board.board[i].add_piece(Bishop(square.piece_on_top.col))
+                temp_board.move_piece(temp_board.board[index], temp_board.board[move])
+                for i, square in enumerate(temp_board.board):
+                    if square.piece_on_top and square.piece_on_top.piece_type.lower() == "king" and square.piece_on_top.col == \
+                            chess_board.board[index].piece_on_top.col:
+                        king_location = i
+                for enemy_move in enemy_square.piece_on_top.valid_moves(temp_board):
+                    temp_board.evaluate_position()
+                    if enemy_move == king_location and (temp_board.eval > 500 or temp_board.eval < 500) and \
+                            temp_board.board[enemy_square.position].piece_on_top.col != chess_board.board[
+                        index].piece_on_top.col:
+                        king_can_be_taken = True
+                        break
+                if king_can_be_taken:
+                    break
+        if not (king_can_be_taken):
+            return True
 
     def set_up(self, side=0):
         self.player_side = side

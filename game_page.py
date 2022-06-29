@@ -79,7 +79,7 @@ def clicked(event, board_width, chess_board, c):
 
     # if chess_board.board[index].piece_on_top:
     #     for move in chess_board.board[index].piece_on_top.valid_moves(chess_board):
-    #         if check_if_move_valid(move,index,chess_board):
+    #         if chess_board.check_if_move_valid(move,index,chess_board):
     #             pos_moves.append(move)
     chess_board.display_board(pos_moves)
 
