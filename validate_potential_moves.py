@@ -1,5 +1,6 @@
 
 from show_messages import *
+from stockfish_interpreter import *
 
 
 def check_for_checkmate(chess_board):
@@ -51,3 +52,6 @@ def perform_move(index, chess_board):
         chess_board.current_side = 2
 
     print(chess_board.moves[len(chess_board.moves) - 1])
+    sf_move_piece(chess_board.moves[len(chess_board.moves) - 1])
+    # if chess_board.current_side != chess_board.player_side:
+    #     print("--"+sf_best_move()+"--")

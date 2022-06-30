@@ -34,6 +34,7 @@ class Board(object):
         self.currently_in_check = False
         self.moves = []
         self.next_move_dont_add = False
+        self.use_stockfish = True
         for index in range(64):
             self.board[index] = Square(index, ((index+(index//8))%2!=0)*1)
 
@@ -71,22 +72,37 @@ class Board(object):
         elif self.player_side == 1:
             return files[7-(index % 8)] + str(ranks[index // 8])
 
+    def chess_notation_to_index(self, move):
+        files = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        ranks = [1,2,3,4,5,6,7,8]
+        indexone = None
+        indextwo = None
+        if len(move)==4:
+            indexone = move[0] + move[1]
+            indextwo = move[2] + move[3]
+        if self.player_side == 0:
+            go_from = (files.index(indexone[0]))+((7-ranks.index(int(indexone[1])))*8)
+            go_to = (files.index(indextwo[0]))+((7-ranks.index(int(indextwo[1])))*8)
+            return [go_from,go_to]
+        elif self.player_side == 1:
+            go_from = (7-files.index(indexone[0]))+(ranks.index(int(indexone[1]))*8)
+            go_to = (7-files.index(indextwo[0]))+(ranks.index(int(indextwo[1]))*8)
+            return [go_from,go_to]
+
     def move_piece(self,sq_one,sq_two, next_side=True):
         if next_side == "o-o" or next_side == "o-o-o":
-            if self.current_side == 0:
-                self.moves.append(next_side.replace("o", "O"))
-            else:
-                self.moves.append(next_side)
+            # if self.current_side == 0:
+            #     self.moves.append(next_side.replace("o", "O"))
+            # else:
+            #     self.moves.append(next_side)
+            self.moves.append(self.index_to_chess_notation(sq_one.position) + self.index_to_chess_notation(sq_two.position))
             self.next_move_dont_add = True
         else:
             self.current_side = not(self.current_side)
             if not(self.next_move_dont_add):
                 original_pos = self.index_to_chess_notation(sq_one.position)
-                middle_bit = " "
-                if sq_two.piece_on_top:
-                    middle_bit = " x "
                 new_pos = self.index_to_chess_notation(sq_two.position)
-                self.moves.append(original_pos + middle_bit + new_pos)
+                self.moves.append(original_pos+new_pos)
             else:
                 self.next_move_dont_add = False
         sq_two.add_piece(sq_one.piece_on_top)
@@ -95,49 +111,55 @@ class Board(object):
         self.evaluate_position()
 
     def ai_move(self):
-        self.calculate_current_side_moves()
-        squares_with_moves = []
-        enemy_moves = get_all_moves_from_side(self.player_side, self)
-        for square in get_all_moves_from_side(self.current_side, self, False, True):
-            squares_with_moves.append(square)
-        ran_sq = r.choice(squares_with_moves)
-        chosen_squares = [ran_sq, ran_sq]
-        chosen_moves = [False, False]
-        for square in squares_with_moves:
-            if square.position in enemy_moves:
-                if not(chosen_moves[1]) or (square.piece_on_top.value>=chosen_squares[1].piece_on_top.value):
-                    for move in square.piece_on_top.valid_moves(self):
-                        if self.check_if_move_valid(move,square.position,self):
-                            chosen_squares[1] = square
-                            chosen_moves[1] = move
-                            if self.board[move].piece_on_top:
-                                break
-            for move in square.piece_on_top.valid_moves(self):
-                if self.board[move].piece_on_top:
-                    if not(chosen_moves[0]) or (self.board[move].piece_on_top.value>=self.board[chosen_moves[0]].piece_on_top.value):
-                        if self.check_if_move_valid(move,square.position,self):
-                            chosen_square = square
-                            chosen_move = move
+        if not(self.use_stockfish):
+            self.calculate_current_side_moves()
+            squares_with_moves = []
+            enemy_moves = get_all_moves_from_side(self.player_side, self)
+            for square in get_all_moves_from_side(self.current_side, self, False, True):
+                squares_with_moves.append(square)
+            ran_sq = r.choice(squares_with_moves)
+            chosen_squares = [ran_sq, ran_sq]
+            chosen_moves = [False, False]
+            for square in squares_with_moves:
+                if square.position in enemy_moves:
+                    if not(chosen_moves[1]) or (square.piece_on_top.value>=chosen_squares[1].piece_on_top.value):
+                        for move in square.piece_on_top.valid_moves(self):
+                            if self.check_if_move_valid(move,square.position,self):
+                                chosen_squares[1] = square
+                                chosen_moves[1] = move
+                                if self.board[move].piece_on_top:
+                                    break
+                for move in square.piece_on_top.valid_moves(self):
+                    if self.board[move].piece_on_top:
+                        if not(chosen_moves[0]) or (self.board[move].piece_on_top.value>=self.board[chosen_moves[0]].piece_on_top.value):
+                            if self.check_if_move_valid(move,square.position,self):
+                                chosen_square = square
+                                chosen_move = move
 
-        to_highlight = False
+            to_highlight = False
 
-        if not(chosen_moves[0]):
-            chosen_moves[0] = r.choice(chosen_squares[0].piece_on_top.valid_moves(self))
-        if chosen_moves[1]: #and (not(self.board[chosen_moves[0]].piece_on_top) or(chosen_squares[1].piece_on_top.value>self.board[chosen_moves[0]].piece_on_top.value)):
-            self.current_highlighted = chosen_squares[1]
-            perform_move(chosen_moves[1],self)
-            to_highlight = chosen_moves[1]
+            if not(chosen_moves[0]):
+                chosen_moves[0] = r.choice(chosen_squares[0].piece_on_top.valid_moves(self))
+            if chosen_moves[1]: #and (not(self.board[chosen_moves[0]].piece_on_top) or(chosen_squares[1].piece_on_top.value>self.board[chosen_moves[0]].piece_on_top.value)):
+                self.current_highlighted = chosen_squares[1]
+                perform_move(chosen_moves[1],self)
+                to_highlight = chosen_moves[1]
+            else:
+                self.current_highlighted = chosen_squares[0]
+                perform_move(chosen_moves[0], self)
+                to_highlight = chosen_moves[0]
+
+            if self.current_highlighted:
+                self.current_highlighted.highlighted = False
         else:
-            self.current_highlighted = chosen_squares[0]
-            perform_move(chosen_moves[0], self)
-            to_highlight = chosen_moves[0]
-
-        if self.current_highlighted:
-            self.current_highlighted.highlighted = False
+            moves_to_perform = self.chess_notation_to_index(sf_best_move())
+            self.current_highlighted = self.board[moves_to_perform[0]]
+            perform_move(moves_to_perform[1], self)
+            to_highlight = moves_to_perform[1]
 
         self.board[to_highlight].highlighted = True
         self.current_highlighted = self.board[to_highlight]
-        self.display_board([],True)
+        self.display_board([], True)
         self.calculate_current_side_moves()
 
     def evaluate_position(self):
