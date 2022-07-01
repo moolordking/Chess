@@ -36,7 +36,7 @@ class Board_Canvas(object):
 
         if self.chess_board:
             self.eval_text_value.set(str(self.chess_board.eval))
-        self.eval_text.pack(side=RIGHT, padx=self.board_width*0.01)
+        self.eval_text.grid(column=4, row=1, padx=self.board_width*0.08)
 
     def clear(self, what="all"):
         self.images = []
@@ -47,9 +47,21 @@ def change_piece_set(chess_board, chosen_set="classic"):
     chess_board.piece_set = chosen_set
     chess_board.display_board()
 
-def piece_set_callback(*args):
-    print("piece set changed")
-    # change_piece_set(chess_board, var.get())
+
+def piece_set_callback(set_var, name, index, mode):
+    global chess_board_global
+    # print(f"piece set changed")
+    change_piece_set(chess_board_global, set_var.get())
+
+def stockfish_skill_callback(skill_var, name, index, mode):
+    if skill_var == "easy":
+        sf_skill_level(5)
+    elif skill_var == "medium":
+        sf_skill_level(12)
+    elif skill_var == "hard":
+        sf_skill_level(18)
+    elif skill_var == "impossible":
+        sf_skill_level(30)
 
 
 def clicked(event, board_width, chess_board, c):
@@ -83,7 +95,9 @@ def clicked(event, board_width, chess_board, c):
     #             pos_moves.append(move)
     chess_board.display_board(pos_moves)
 
+chess_board_global = None
 def create_game_gui(player_side=0,old_root=None):
+    global chess_board_global
     if old_root:
         old_root.destroy()
     # create window
@@ -91,7 +105,7 @@ def create_game_gui(player_side=0,old_root=None):
     root = Tk()
     root.title("Menu")
     app = wx.App(False)
-    root.geometry(f"{int(board_width*1.6)}x{board_width+30}+{(wx.GetDisplaySize()[0]//2)-int(board_width*1.6/2)}+{(wx.GetDisplaySize()[1]//2)-int(board_width/2)}")
+    root.geometry(f"{int(board_width*1.2)}x{board_width+30}+{(wx.GetDisplaySize()[0]//2)-int(board_width*1.6/2)}+{(wx.GetDisplaySize()[1]//2)-int(board_width/2)}")
     root.configure(background=get_colour(0))
     root.resizable(False, False)
 
@@ -100,16 +114,26 @@ def create_game_gui(player_side=0,old_root=None):
     set_var.set(sets[0])
     opt = OptionMenu(root, set_var, *sets)
     opt.config(width=10, font=(get_font(), 12), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
-    opt.pack(anchor="w")
+    opt.grid(column=0, row=0, sticky="w")
+
+    skill_levels = ["easy", "medium", "hard", "impossible"]
+    skill_var = StringVar(root)
+    skill_var.set(skill_levels[1])
+    opt_sk = OptionMenu(root, skill_var, *skill_levels)
+    opt_sk.config(width=10, font=(get_font(), 12), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
+    opt_sk.grid(column=1, row=0, sticky="w")
 
     canv = Board_Canvas(root,board_width)
-    canv.c.pack(anchor='w')
+    canv.c.grid(columnspan=3, column=0, row=1)
 
     chess_board = create_board(canv,board_width,player_side)
     canv.chess_board = chess_board
     chess_board.display_board()
 
-    set_var.trace("w", piece_set_callback)
+    chess_board_global = chess_board
+
+    set_var.trace("w", lambda *args: piece_set_callback(set_var, *args))
+    skill_var.trace("w", lambda *args: stockfish_skill_callback(skill_var, *args))
 
     root.bind('<Button-1>',lambda event,
         A=board_width,
@@ -120,6 +144,7 @@ def create_game_gui(player_side=0,old_root=None):
     root.mainloop()
 
 def create_board(canv,board_width,side=0):
+    global chess_board_global
     chess_board = Board(canv,board_width)
     chess_board.set_up(side)
     return chess_board

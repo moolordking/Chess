@@ -1,6 +1,10 @@
 from stockfish import Stockfish
 
 stockfishy = Stockfish(path="stockfish_15_win_x64_popcnt/stockfish_15_x64_popcnt")
+stockfishy.update_engine_parameters({
+    "Hash": 256,
+    "Skill Level": 15
+})
 
 def sf_move_piece(move=1):
     global stockfishy
@@ -12,6 +16,9 @@ def sf_move_piece(move=1):
 def sf_best_move():
     global stockfishy
     return stockfishy.get_best_move()
+
+def sf_skill_level(level):
+    stockfishy.update_engine_parameters({"Skill Level": level})
 
 if __name__ == "__main__":
     stockfishy.update_engine_parameters({"Hash": 256})
