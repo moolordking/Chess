@@ -1,0 +1,29 @@
+
+==============================================
+==========~~ chess colour palette ~~==========
+=================~ embers ~===================
+
+[#100402] ; background
+[#FFFFFF] ; text
+[#170f0f] ; background alternative
+[#5beeff] ; button and standout colour
+[#33211f] ; chess board light colour
+[#211513] ; chess board dark colour
+[#ffce99] ; selected colour
+[#fff388] ; possible move colour
+[#ff4314] ; capture move colour
+
+
+==============================================
+========~~ creating custom schemes ~~=========
+==============================================
+
+
+ - to create your own colour scheme, 
+   replace what is inside of the [] brackets with your own colours.
+
+ - do not change the formatting of the file, as this could create problems.
+
+ - use the colour picking tool (themes/colour_picker/colours.html) to find colours.
+
+ - restart the program to see colour scheme

@@ -1,0 +1,127 @@
+<html>
+<head>
+   <title>Palette</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+<style>
+body {
+  background-color: black;
+}
+.col_slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 25vh;
+  background: black;
+  outline: none;
+  border: 0.5vh solid #323232;
+  box-shadow: 0.2vh 0.2vh 1px white;
+  margin-bottom: 1vh;
+}
+
+.col_slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10vh;
+  height: 25vh;
+  background: white;
+  cursor: pointer;
+  border: 0.5vh solid #323232;
+}
+
+.out {
+  font-family: monospace;
+  font-size: 5vh;
+  width: 100%;
+  text-align: center;
+  color: #323232;
+  text-shadow: 0.2vh 0.2vh 1px white;
+}
+
+#r::-webkit-slider-thumb:hover {
+  box-shadow: inset 0px 0px 1px 0.5vh #ff4e4e;
+}
+
+#g::-webkit-slider-thumb:hover {
+  box-shadow: inset 0px 0px 1px 0.5vh #3ec374;
+}
+
+#b::-webkit-slider-thumb:hover {
+  box-shadow: inset 0px 0px 1px 0.5vh #359cf6;
+}
+
+</style>
+
+</head>
+<body>
+<input type="range" class="col_slider" id="r" min="0" max="255" value="127.5" />
+<input type="range" class="col_slider" id="g" min="0" max="255" value="127.5" />
+<input type="range" class="col_slider" id="b" min="0" max="255" value="127.5" />
+<div class="out" id="rgb"></div>
+<div class="out" id="hex"></div>
+
+<script>
+
+let r = $("#r");
+let g = $("#g");
+let b = $("#b");
+
+function random_color() {
+  let cols = [];
+  for (i=0;i<3;i++){
+    cols.push(parseInt((85*i)+Math.random()*85));
+  }
+  cols = shuffle_array(cols);
+  r.val(cols[0]);
+  g.val(cols[1]);
+  b.val(cols[2]);
+  set_color();
+}
+
+function set_color() {
+  let col = "rgb("+r.val()+","+g.val()+","+b.val()+")"
+  $("body").css("background-color", col);
+  r.css("background-color", col)
+  g.css("background-color", col)
+  b.css("background-color", col)
+  $("#rgb").text(col);
+  $("#hex").text(rgb_to_hex(r.val(),g.val(),b.val()));
+}
+
+$(document).ready(function() {
+  set_color();
+  random_color();
+  $(".col_slider").mousedown(function() {
+    $(this).mousemove(function() {set_color();});
+  });
+});
+
+function rgb_to_hex(red,green,blue) {
+  red = parseInt(red).toString(16);
+  green = parseInt(green).toString(16);
+  blue = parseInt(blue).toString(16);
+  if (red.length == 1){
+    red = "0" + red;
+  }
+  if (green.length == 1){
+    green = "0" + green;
+  }
+  if (blue.length == 1){
+    blue = "0" + blue;
+  }
+  return "#" + red + green + blue
+}
+
+function shuffle_array(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+</script>
+</body>
+</html>

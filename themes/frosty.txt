@@ -1,0 +1,29 @@
+
+==============================================
+==========~~ chess colour palette ~~==========
+=================~ frosty ~===================
+
+[#0B0C10] ; background
+[#FFFFFF] ; text
+[#1F2833] ; background alternative
+[#5beeff] ; button and standout colour
+[#1F2833] ; chess board light colour
+[#131921] ; chess board dark colour
+[#99eeff] ; selected colour
+[#8899ff] ; possible move colour
+[#DD9988] ; capture move colour
+
+
+==============================================
+========~~ creating custom schemes ~~=========
+==============================================
+
+
+ - to create your own colour scheme, 
+   replace what is inside of the [] brackets with your own colours.
+
+ - do not change the formatting of the file, as this could create problems.
+
+ - use the colour picking tool (themes/colour_picker/colours.html) to find colours.
+
+ - restart the program to see colour scheme
