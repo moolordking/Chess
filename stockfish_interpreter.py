@@ -1,15 +1,17 @@
 from stockfish import Stockfish
 
-stockfishy = Stockfish(path="stockfish_15_win_x64_popcnt/stockfish_15_x64_popcnt")
+stockfishy = Stockfish(path="stockfish_15_win_x64_avx2/stockfish_15_x64_avx2",
+                       parameters={"Skill Level": -5})
 stockfishy.update_engine_parameters({
     "Hash": 256,
-    "Skill Level": 15
+    "UCI_LimitStrength": "true"
 })
 
 def sf_move_piece(move=1):
     global stockfishy
     if move == 1:
         return
+
     stockfishy.make_moves_from_current_position([move])
     # print("**"+stockfishy.get_best_move()+"**")
 

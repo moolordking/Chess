@@ -1,6 +1,6 @@
 import file_handling as fh
 
-def get_colour(num=0, scheme="frosty"):
+def get_colour(num=0, scheme="embers"):
     loc = "themes/"+scheme+".txt"
     cols = []
     col = fh.read_line_from_file(loc, num + 5).split(";")[0][1:-2]

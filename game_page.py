@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 from colours_and_graphics import *
 from board_class import *
 import random as r
-
+import settings_handler as sh
 
 class Board_Canvas(object):
     def __init__(self,root,board_width):
@@ -26,6 +26,7 @@ class Board_Canvas(object):
         for image in self.images:
             self.c.create_image(image[0],image[1],image=image[2])
         self.display_text()
+        self.root.update_idletasks()
     def display_text(self):
 
         # button_font = font.Font(family=get_font(), size=13, weight="bold")
@@ -55,13 +56,13 @@ def piece_set_callback(set_var, name, index, mode):
 
 def stockfish_skill_callback(skill_var, name, index, mode):
     if skill_var == "easy":
-        sf_skill_level(5)
+        sf_skill_level(-20)
     elif skill_var == "medium":
-        sf_skill_level(12)
+        sf_skill_level(-5)
     elif skill_var == "hard":
-        sf_skill_level(18)
+        sf_skill_level(3)
     elif skill_var == "impossible":
-        sf_skill_level(30)
+        sf_skill_level(20)
 
 
 def clicked(event, board_width, chess_board, c):
@@ -74,6 +75,7 @@ def clicked(event, board_width, chess_board, c):
 
     if index in chess_board.current_valid_moves:
         perform_move(index, chess_board)
+
 
         # print(chess_board.eval)
     chess_board.current_valid_moves = []
@@ -94,6 +96,7 @@ def clicked(event, board_width, chess_board, c):
     #         if chess_board.check_if_move_valid(move,index,chess_board):
     #             pos_moves.append(move)
     chess_board.display_board(pos_moves)
+
 
 chess_board_global = None
 def create_game_gui(player_side=0,old_root=None):

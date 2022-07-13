@@ -51,7 +51,7 @@ def perform_move(index, chess_board):
         s_message(f"{winner} wins", "checkmate", 2)
         chess_board.current_side = 2
 
-    print(chess_board.moves[len(chess_board.moves) - 1])
+    # print(chess_board.moves[len(chess_board.moves) - 1])
     sf_move_piece(chess_board.moves[len(chess_board.moves) - 1])
     # if chess_board.current_side != chess_board.player_side:
     #     print("--"+sf_best_move()+"--")

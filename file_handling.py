@@ -19,3 +19,14 @@ def read_file(file_path="text.txt"):
         with open(file_path, "w") as fp:
             return fp.read()
 
+def write_to_line(file_path="text.txt", line=0, data=""):
+    if os.path.isfile(file_path):
+        lines = []
+        with open(file_path, "r") as fp:
+            lines = fp.readlines()
+            lines[line] = data
+            fp.close()
+
+        with open(file_path, "w") as fp:
+            fp.writelines(lines)
+            fp.close()

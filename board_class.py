@@ -4,6 +4,7 @@ from colours_and_graphics import *
 from PIL import Image, ImageTk
 import random as r
 from validate_potential_moves import *
+import time
 
 def get_all_moves_from_side(side,chess_board, check_for_empty=False, get_index_of_pieces=False):
     arr = []
@@ -282,6 +283,7 @@ class Board(object):
                 piece = piece.resize((self.board_width//11,self.board_width//11), Image.ANTIALIAS)
                 piece = ImageTk.PhotoImage(piece)
                 self.canv.images.append([x,y,piece])
+
         self.canv.display()
 
         if len(possible_moves)>0 and self.current_highlighted.piece_on_top.col == self.current_side and self.current_highlighted.piece_on_top.col == self.player_side:

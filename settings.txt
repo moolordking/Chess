@@ -1,0 +1,20 @@
+
+##########################################
+#~         ~program settings~           ~#
+##########################################
+
+[medium] ; computer difficulty
+[embers] ; theme
+[classic] ; piece set
+[random] ; default starting position
+[True] ; clock
+[False] ; slower stockfish version, use for older machines
+[600] ; board width
+
+##########################################
+#~         ~editing settings~           ~#
+##########################################
+
+ + to change settings, enter the settings menu in the program
+
+ + if altering settings manually, beware the risk of causing crashes
