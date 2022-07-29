@@ -6,7 +6,7 @@
 [#100402] ; background
 [#FFFFFF] ; text
 [#170f0f] ; background alternative
-[#5beeff] ; button and standout colour
+[#eabb00] ; button and standout colour
 [#33211f] ; chess board light colour
 [#211513] ; chess board dark colour
 [#ffce99] ; selected colour

@@ -1,0 +1,29 @@
+
+==============================================
+==========~~ chess colour palette ~~==========
+=================~ hicont ~===================
+
+[#000] ; background
+[#FFFFFF] ; text
+[#222] ; background alternative
+[#FF0000] ; button and standout colour
+[#ff00fa] ; chess board light colour
+[#222] ; chess board dark colour
+[#00e5ff] ; selected colour
+[#ffff00] ; possible move colour
+[#10ff00] ; capture move colour
+
+
+==============================================
+========~~ creating custom schemes ~~=========
+==============================================
+
+
+ - to create your own colour scheme, 
+   replace what is inside of the [] brackets with your own colours.
+
+ - do not change the formatting of the file, as this could create problems.
+
+ - use the colour picking tool (themes/colour_picker/colours.html) to find colours.
+
+ - restart the program to see colour scheme

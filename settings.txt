@@ -4,10 +4,10 @@
 ##########################################
 
 [medium] ; computer difficulty
-[embers] ; theme
+[frosty] ; theme
 [classic] ; piece set
 [random] ; default starting position
-[True] ; clock
+[False] ; clock
 [False] ; slower stockfish version, use for older machines
 [600] ; board width
 

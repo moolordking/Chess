@@ -1,7 +1,10 @@
 import file_handling as fh
+import settings_handler as sh
 
-def get_colour(num=0, scheme="embers"):
-    loc = "themes/"+scheme+".txt"
+curr_scheme = "frosty"
+
+def get_colour(num=0, scheme="frosty"):
+    loc = "themes/"+sh.get_settings(1)+".txt"
     cols = []
     col = fh.read_line_from_file(loc, num + 5).split(";")[0][1:-2]
     return col

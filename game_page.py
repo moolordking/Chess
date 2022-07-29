@@ -104,27 +104,28 @@ def create_game_gui(player_side=0,old_root=None):
     if old_root:
         old_root.destroy()
     # create window
-    board_width = 600
+    board_width = int(sh.get_settings(6))
     root = Tk()
-    root.title("Menu")
+    root.title("Chess")
     app = wx.App(False)
-    root.geometry(f"{int(board_width*1.2)}x{board_width+30}+{(wx.GetDisplaySize()[0]//2)-int(board_width*1.6/2)}+{(wx.GetDisplaySize()[1]//2)-int(board_width/2)}")
+    root.geometry(f"{int(board_width*1.2)}x{board_width}+{(wx.GetDisplaySize()[0]//2)-int(board_width*1.6/2)}+{(wx.GetDisplaySize()[1]//2)-int(board_width/2)}")
     root.configure(background=get_colour(0))
+    root.iconbitmap('favicon.ico')
     root.resizable(False, False)
 
-    sets = ["classic", "rabisco", "tyke"]
-    set_var = StringVar(root)
-    set_var.set(sets[0])
-    opt = OptionMenu(root, set_var, *sets)
-    opt.config(width=10, font=(get_font(), 12), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
-    opt.grid(column=0, row=0, sticky="w")
+    # sets = ["classic", "rabisco", "tyke"]
+    # set_var = StringVar(root)
+    # set_var.set(sets[0])
+    # opt = OptionMenu(root, set_var, *sets)
+    # opt.config(width=10, font=(get_font(), int(board_width/50)), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
+    # opt.grid(column=0, row=0, sticky="w")
 
-    skill_levels = ["easy", "medium", "hard", "impossible"]
-    skill_var = StringVar(root)
-    skill_var.set(skill_levels[1])
-    opt_sk = OptionMenu(root, skill_var, *skill_levels)
-    opt_sk.config(width=10, font=(get_font(), 12), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
-    opt_sk.grid(column=1, row=0, sticky="w")
+    # skill_levels = ["easy", "medium", "hard", "impossible"]
+    # skill_var = StringVar(root)
+    # skill_var.set(skill_levels[1])
+    # opt_sk = OptionMenu(root, skill_var, *skill_levels)
+    # opt_sk.config(width=10, font=(get_font(), int(board_width/50)), bg=get_colour(4), borderwidth=0, fg=get_colour(1))
+    # opt_sk.grid(column=0, row=0, sticky="w", padx=int(board_width/4.5))
 
     canv = Board_Canvas(root,board_width)
     canv.c.grid(columnspan=3, column=0, row=1)
@@ -135,14 +136,16 @@ def create_game_gui(player_side=0,old_root=None):
 
     chess_board_global = chess_board
 
-    set_var.trace("w", lambda *args: piece_set_callback(set_var, *args))
-    skill_var.trace("w", lambda *args: stockfish_skill_callback(skill_var, *args))
+    # set_var.trace("w", lambda *args: piece_set_callback(set_var, *args))
+    # skill_var.trace("w", lambda *args: stockfish_skill_callback(skill_var, *args))
 
     root.bind('<Button-1>',lambda event,
         A=board_width,
         B=chess_board,
         C=canv: clicked(event,A,B,C)
     )
+
+    change_piece_set(chess_board, sh.get_settings(2))
 
     root.mainloop()
 
